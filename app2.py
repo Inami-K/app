@@ -537,7 +537,7 @@ if choice == each_feature:
             st.dataframe(df_train[feature_choice].describe())
 
     #質的変数の処理
-    def categorical_feature(df_train, feature_choice, max_display=10):
+    def categorical_feature(df_train, df_test, feature_choice, max_display=10):
         st.write(f'<h1 style="font-size: 24px;">{feature_choice} の要約</h1>', unsafe_allow_html=True)
 
         unique_values = df_train[feature_choice].unique()
@@ -603,7 +603,7 @@ if choice == each_feature:
     # 量的変数の条件
     if pd.api.types.is_numeric_dtype(cleaned_data):
         # 数値型でユニークな値が100未満の場合はカテゴリカルとみなす
-        if cleaned_data.nunique() < 100:
+        if cleaned_data.nunique() < 50:
             select_type(1)  # カテゴリカルなデータとして処理
         else:
             select_type(0)  # 連続的な数値データとして処理
@@ -940,14 +940,17 @@ elif choice == model:
             st.markdown(f'<br>**混同行列 / 予測確立 / ROC曲線**', unsafe_allow_html=True)                
             report1_col1, report1_col2, report1_col3 = st.columns(3)
             with report1_col1:
-                cm = confusion_matrix(y_test, y_pred)
-                plt.figure(figsize=(8, 6))  # サイズを指定
-                sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=unique_classes, yticklabels=unique_classes)
-                plt.xlabel('Predicted labels')
-                plt.ylabel('True labels')
-                plt.title('Confusion Matrix')
-                st.pyplot(plt)
-                plt.clf()
+                def cm():
+                    cm = confusion_matrix(y_test, y_pred)
+                    plt.figure(figsize=(8, 6))  # サイズを指定
+                    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=unique_classes, yticklabels=unique_classes)
+                    plt.xlabel('Predicted labels')
+                    plt.ylabel('True labels')
+                    plt.title('Confusion Matrix')
+                    st.pyplot(plt)
+                    plt.clf()
+
+                cm()
 
             with report1_col2:
                 if len(unique_classes) == 2:
